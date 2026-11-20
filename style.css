@@ -1,0 +1,192 @@
+/* Reset default browser spacing and use border-box sizing */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base page font, colors, and background */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f6f9;
+  color: #1e293b;
+  line-height: 1.5;
+  padding-bottom: 48px;
+}
+
+/* Centered page container with max width */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Top header banner styling */
+.page-header {
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 28px 0;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+/* Reusable white card container for chart and table sections */
+.card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.section-header {
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Layout for table heading and search box */
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.row-count {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Search input field styling */
+.search-box {
+  width: 100%;
+  max-width: 360px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.search-input:focus {
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Chart container with fixed responsive height for Chart.js */
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 340px;
+}
+
+/* Enable horizontal scrolling for wide tables on smaller screens */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+/* Data table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+thead {
+  background-color: #f1f5f9;
+}
+
+th {
+  padding: 12px 14px;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 2px solid #cbd5e1;
+  white-space: nowrap;
+}
+
+td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+/* Zebra striping and hover highlight for better readability */
+tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+tbody tr:hover {
+  background-color: #eff6ff;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Highlight stock levels that are at or below the reorder point */
+.low-stock {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* Message shown when no rows match the search query */
+.empty-message {
+  padding: 28px 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* Responsive adjustments for mobile and tablet screens */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 20px 0;
+  }
+
+  .page-header h1 {
+    font-size: 1.45rem;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .chart-wrapper {
+    height: 260px;
+  }
+}
