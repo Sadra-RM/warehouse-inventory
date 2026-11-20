@@ -3,19 +3,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // Read the global "data" array from data.js (use an empty array if missing)
   const inventoryData = typeof data !== "undefined" && Array.isArray(data) ? data : [];
 
-  // Exact column keys matching each object in the warehouse dataset
+  // Each column: "key" must match the property name in data.js, "label" is the header shown on the page
   const columns = [
-    "Item",
-    "Category",
-    "Stock Level",
-    "Reorder Point",
-    "Reorder Frequency Days",
-    "Lead Time Days",
-    "Daily Demand",
-    "Demand STD DEV",
-    "Item Popularity Score",
-    "Storage Location ID",
-    "Zone"
+    { key: "item_id", label: "Item" },
+    { key: "category", label: "Category" },
+    { key: "stock_level", label: "Stock Level" },
+    { key: "reorder_point", label: "Reorder Point" },
+    { key: "reorder_frequency", label: "Reorder Frequency Days" },
+    { key: "lead_time_days", label: "Lead Time Days" },
+    { key: "daily_demand", label: "Daily Demand" },
+    { key: "demand_std", label: "Demand STD DEV" },
+    { key: "item_popularity", label: "Item Popularity Score" },
+    { key: "storage_location", label: "Storage Location ID" },
+    { key: "zone", label: "Zone" }
   ];
 
   // Get references to HTML elements we need to update
@@ -47,9 +47,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Build the table header row from the column names
     const headerRow = document.createElement("tr");
-    columns.forEach(function (columnName) {
+    columns.forEach(function (column) {
       const th = document.createElement("th");
-      th.textContent = columnName;
+      th.textContent = column.label;
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -58,17 +58,17 @@ document.addEventListener("DOMContentLoaded", function () {
     rows.forEach(function (item) {
       const tr = document.createElement("tr");
 
-      columns.forEach(function (columnName) {
+      columns.forEach(function (column) {
         const td = document.createElement("td");
-        const value = item[columnName];
+        const value = item[column.key];
 
         // Safely insert cell text (fallback to "-" if a value is missing)
         td.textContent = value !== undefined && value !== null ? value : "-";
 
         // Highlight the stock level if it is at or below the reorder point
         if (
-          columnName === "Stock Level" &&
-          Number(item["Stock Level"]) <= Number(item["Reorder Point"])
+          column.key === "stock_level" &&
+          Number(item.stock_level) <= Number(item.reorder_point)
         ) {
           td.className = "low-stock";
         }
@@ -97,8 +97,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Keep items where at least one field contains the search text
     const filtered = inventoryData.filter(function (item) {
-      return columns.some(function (columnName) {
-        const value = item[columnName];
+      return columns.some(function (column) {
+        const value = item[column.key];
         return String(value !== undefined && value !== null ? value : "")
           .toLowerCase()
           .includes(query);

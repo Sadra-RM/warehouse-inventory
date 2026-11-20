@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Count how many items belong to each category
   const categoryCounts = {};
   inventoryData.forEach(function (item) {
-    const category = item["Category"] || "Uncategorized";
+    const category = item.category || "Uncategorized";
     categoryCounts[category] = (categoryCounts[category] || 0) + 1;
   });
 
