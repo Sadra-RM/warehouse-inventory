@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Set character encoding and responsive viewport for all devices -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Page title and metadata for search engines and link previews -->
+  <title>Warehouse Inventory Dashboard</title>
+  <meta name="description" content="A static web page displaying warehouse inventory data with live search filtering and a category bar chart." />
+  <meta property="og:title" content="Warehouse Inventory Dashboard" />
+  <meta property="og:description" content="A static web page displaying warehouse inventory data with live search filtering and a category bar chart." />
+  <meta property="og:type" content="website" />
+
+  <!-- Load our custom stylesheet using a relative path -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Load the Chart.js library from the jsDelivr CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Page header with main title and short description -->
+  <header class="page-header">
+    <div class="container">
+      <h1>Warehouse Inventory</h1>
+      <p class="subtitle">Browse stock levels, filter items in real time, and view item counts by category.</p>
+    </div>
+  </header>
+
+  <!-- Main content area -->
+  <main class="container">
+    <!-- Section 1: Bar chart showing number of items per category -->
+    <section class="card chart-section">
+      <div class="section-header">
+        <h2>Items per Category</h2>
+      </div>
+      <div class="chart-wrapper">
+        <!-- Canvas element where Chart.js draws the bar chart -->
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Section 2: Search box and inventory data table -->
+    <section class="card table-section">
+      <div class="section-header table-controls">
+        <div>
+          <h2>Inventory List</h2>
+          <p id="rowCount" class="row-count">Loading items...</p>
+        </div>
+
+        <!-- Live search input box -->
+        <div class="search-box">
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search by item, category, zone, or location..."
+            aria-label="Search warehouse inventory"
+          />
+        </div>
+      </div>
+
+      <!-- Container where table.js builds and inserts the HTML table -->
+      <div id="tableContainer" class="table-container"></div>
+    </section>
+  </main>
+
+  <!-- Load scripts in the required order using relative file paths -->
+  <script src="data.js"></script>
+  <script src="table.js"></script>
+  <script src="charts.js"></script>
+</body>
+</html>
