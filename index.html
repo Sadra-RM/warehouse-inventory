@@ -7,36 +7,48 @@
 
   <!-- Page title and metadata for search engines and link previews -->
   <title>Warehouse Inventory Dashboard</title>
-  <meta name="description" content="A static web page displaying warehouse inventory data with live search filtering and a category bar chart." />
+  <meta name="description" content="A static web page displaying warehouse item data with live search filtering and selectable bar charts." />
   <meta property="og:title" content="Warehouse Inventory Dashboard" />
-  <meta property="og:description" content="A static web page displaying warehouse inventory data with live search filtering and a category bar chart." />
+  <meta property="og:description" content="A static web page displaying warehouse item data with live search filtering and selectable bar charts." />
   <meta property="og:type" content="website" />
 
   <!-- Load our custom stylesheet using a relative path -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Load the Chart.js library from the jsDelivr CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <!-- Page header with main title and short description -->
   <header class="page-header">
     <div class="container">
       <h1>Warehouse Inventory</h1>
-      <p class="subtitle">Browse stock levels, filter items in real time, and view item counts by category.</p>
+      <p class="subtitle">Browse item data, filter items in real time, and view item counts by category.</p>
     </div>
   </header>
 
   <!-- Main content area -->
   <main class="container">
-    <!-- Section 1: Bar chart showing number of items per category -->
+    <!-- Section 1: Bar chart with a dropdown to choose what to chart -->
     <section class="card chart-section">
-      <div class="section-header">
-        <h2>Items per Category</h2>
+      <div class="section-header chart-controls">
+        <h2 id="chartTitle">Items per Category</h2>
+
+        <!-- Dropdown to choose which chart to show -->
+        <div class="chart-select-box">
+          <label for="chartSelect">Chart:</label>
+          <select id="chartSelect" class="chart-select" aria-label="Choose chart type">
+            <option value="category">Number of items per category</option>
+            <option value="zone">Number of items per zone</option>
+            <option value="location">Number of items per storage location</option>
+            <option value="orders">Total orders last month per category</option>
+          </select>
+        </div>
       </div>
-      <div class="chart-wrapper">
-        <!-- Canvas element where Chart.js draws the bar chart -->
-        <canvas id="categoryChart"></canvas>
+
+      <!-- Scrolls sideways when a chart has many bars (e.g. storage locations) -->
+      <div class="chart-scroll">
+        <div id="chartWrapper" class="chart-wrapper">
+          <!-- Canvas element where Chart.js draws the bar chart -->
+          <canvas id="categoryChart"></canvas>
+        </div>
       </div>
     </section>
 
