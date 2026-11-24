@@ -7,21 +7,63 @@ document.addEventListener("DOMContentLoaded", function () {
   const columns = [
     { key: "item_id", label: "Item" },
     { key: "category", label: "Category" },
-    { key: "stock_level", label: "Stock Level" },
-    { key: "reorder_point", label: "Reorder Point" },
-    { key: "reorder_frequency", label: "Reorder Frequency Days" },
-    { key: "lead_time_days", label: "Lead Time Days" },
     { key: "daily_demand", label: "Daily Demand" },
-    { key: "demand_std", label: "Demand STD DEV" },
-    { key: "item_popularity", label: "Item Popularity Score" },
-    { key: "storage_location", label: "Storage Location ID" },
-    { key: "zone", label: "Zone" }
+    { key: "item_popularity_score", label: "Item Popularity Score" },
+    { key: "storage_location_id", label: "Storage Location ID" },
+    { key: "zone", label: "Zone" },
+    { key: "unit_price", label: "Unit Price" },
+    { key: "total_orders_last_month", label: "Total Orders Last Month" },
+    { key: "KPI_score", label: "KPI Score" }
   ];
 
   // Get references to HTML elements we need to update
   const tableContainer = document.getElementById("tableContainer");
   const searchInput = document.getElementById("searchInput");
   const rowCount = document.getElementById("rowCount");
+
+  // Current sort settings: which column is sorted and in which direction.
+  // sortDirection is "asc" (lowest to highest), "desc" (highest to lowest), or null (original order)
+  let sortKey = null;
+  let sortDirection = null;
+
+  // Compare two values: numbers are compared as numbers, text is compared naturally (L2 before L10)
+  function compareValues(a, b) {
+    const aMissing = a === undefined || a === null || a === "";
+    const bMissing = b === undefined || b === null || b === "";
+    if (aMissing && bMissing) return 0;
+    if (aMissing) return 1; // empty values always go to the bottom
+    if (bMissing) return -1;
+
+    if (typeof a === "number" && typeof b === "number") {
+      return a - b;
+    }
+    return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: "base" });
+  }
+
+  // Return a sorted copy of the rows (the original data is never changed)
+  function sortRows(rows) {
+    if (!sortKey || !sortDirection) {
+      return rows;
+    }
+    const direction = sortDirection === "asc" ? 1 : -1;
+    return rows.slice().sort(function (rowA, rowB) {
+      return direction * compareValues(rowA[sortKey], rowB[sortKey]);
+    });
+  }
+
+  // Called when a column header is clicked: lowest->highest, then highest->lowest, then back to original order
+  function handleHeaderClick(columnKey) {
+    if (sortKey !== columnKey) {
+      sortKey = columnKey;
+      sortDirection = "asc";
+    } else if (sortDirection === "asc") {
+      sortDirection = "desc";
+    } else {
+      sortKey = null;
+      sortDirection = null;
+    }
+    updateTable();
+  }
 
   // Build and display the HTML table for a given array of rows
   function renderTable(rows) {
@@ -49,7 +91,31 @@ document.addEventListener("DOMContentLoaded", function () {
     const headerRow = document.createElement("tr");
     columns.forEach(function (column) {
       const th = document.createElement("th");
-      th.textContent = column.label;
+      th.className = "sortable";
+      th.tabIndex = 0; // lets keyboard users focus the header and press Enter to sort
+
+      // Show an arrow: up = lowest to highest, down = highest to lowest, double arrow = not sorted
+      let arrow = " \u2195";
+      let ariaSort = "none";
+      if (column.key === sortKey) {
+        th.classList.add("sorted");
+        arrow = sortDirection === "asc" ? " \u25B2" : " \u25BC";
+        ariaSort = sortDirection === "asc" ? "ascending" : "descending";
+      }
+      th.setAttribute("aria-sort", ariaSort);
+      th.textContent = column.label + arrow;
+      th.title = "Click to sort by " + column.label;
+
+      th.addEventListener("click", function () {
+        handleHeaderClick(column.key);
+      });
+      th.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleHeaderClick(column.key);
+        }
+      });
+
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -65,12 +131,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Safely insert cell text (fallback to "-" if a value is missing)
         td.textContent = value !== undefined && value !== null ? value : "-";
 
-        // Highlight the stock level if it is at or below the reorder point
-        if (
-          column.key === "stock_level" &&
-          Number(item.stock_level) <= Number(item.reorder_point)
-        ) {
-          td.className = "low-stock";
+        // Color the whole sorted column so it is easy to see
+        if (column.key === sortKey) {
+          td.className = "sorted-col";
         }
 
         tr.appendChild(td);
@@ -85,32 +148,29 @@ document.addEventListener("DOMContentLoaded", function () {
     tableContainer.appendChild(table);
   }
 
-  // Filter rows in real time based on what the user typed
-  function filterRows() {
+  // Apply the current search text and sort settings, then redraw the table
+  function updateTable() {
     const query = searchInput.value.trim().toLowerCase();
 
-    // If the search box is empty, show all items
-    if (query === "") {
-      renderTable(inventoryData);
-      return;
-    }
+    // If the search box is empty, use all items; otherwise keep items where any field contains the text
+    const filtered =
+      query === ""
+        ? inventoryData
+        : inventoryData.filter(function (item) {
+            return columns.some(function (column) {
+              const value = item[column.key];
+              return String(value !== undefined && value !== null ? value : "")
+                .toLowerCase()
+                .includes(query);
+            });
+          });
 
-    // Keep items where at least one field contains the search text
-    const filtered = inventoryData.filter(function (item) {
-      return columns.some(function (column) {
-        const value = item[column.key];
-        return String(value !== undefined && value !== null ? value : "")
-          .toLowerCase()
-          .includes(query);
-      });
-    });
-
-    renderTable(filtered);
+    renderTable(sortRows(filtered));
   }
 
   // Listen for typing in the search box to filter rows live
-  searchInput.addEventListener("input", filterRows);
+  searchInput.addEventListener("input", updateTable);
 
   // Display the complete table when the page first loads
-  renderTable(inventoryData);
+  updateTable();
 });
