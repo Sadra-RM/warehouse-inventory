@@ -46,7 +46,9 @@ document.addEventListener("DOMContentLoaded", function () {
       yLabel: "Number of Items",
       datasetLabel: "Number of Items",
       color: "#2563eb",
-      hoverColor: "#1d4ed8"
+      hoverColor: "#1d4ed8",
+      darkColor: "#3b82f6",
+      darkHoverColor: "#60a5fa"
     },
     zone: {
       title: "Items per Zone",
@@ -56,6 +58,8 @@ document.addEventListener("DOMContentLoaded", function () {
       datasetLabel: "Number of Items",
       color: "#7c3aed",
       hoverColor: "#6d28d9",
+      darkColor: "#8b5cf6",
+      darkHoverColor: "#a78bfa",
       sortLabels: true
     },
     location: {
@@ -66,6 +70,8 @@ document.addEventListener("DOMContentLoaded", function () {
       datasetLabel: "Number of Items",
       color: "#0891b2",
       hoverColor: "#0e7490",
+      darkColor: "#06b6d4",
+      darkHoverColor: "#22d3ee",
       sortLabels: true,
       pixelsPerBar: 26 // makes the chart wider so all location IDs stay readable
     },
@@ -77,7 +83,9 @@ document.addEventListener("DOMContentLoaded", function () {
       yLabel: "Total Orders (last month)",
       datasetLabel: "Total Orders Last Month",
       color: "#059669",
-      hoverColor: "#047857"
+      hoverColor: "#047857",
+      darkColor: "#10b981",
+      darkHoverColor: "#34d399"
     }
   };
 
@@ -87,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Small black box that shows the label and value when you point at a bar
   const tooltip = document.createElement("div");
   tooltip.style.cssText =
-    "position:absolute;display:none;pointer-events:none;z-index:2;background:#0f172a;color:#fff;" +
+    "position:absolute;display:none;pointer-events:none;z-index:2;background:var(--tooltip-bg);color:var(--tooltip-text);" +
     "padding:6px 10px;border-radius:6px;font-size:12px;white-space:nowrap;transform:translate(-50%,-100%);";
   chartWrapper.appendChild(tooltip);
 
@@ -113,8 +121,27 @@ document.addEventListener("DOMContentLoaded", function () {
     ctx.fill();
   }
 
+  // Read the chart colors of the current theme (light or dark) from style.css
+  function readColors() {
+    const styles = getComputedStyle(document.documentElement);
+    const get = function (name, fallback) {
+      return styles.getPropertyValue(name).trim() || fallback;
+    };
+    return {
+      dark: document.documentElement.getAttribute("data-theme") === "dark",
+      text: get("--chart-text", "#475569"),
+      muted: get("--chart-muted", "#64748b"),
+      value: get("--chart-value", "#334155"),
+      grid: get("--chart-grid", "#e2e8f0"),
+      axis: get("--chart-axis", "#94a3b8")
+    };
+  }
+
   // Draw the whole chart on the canvas
   function render() {
+    const colors = readColors();
+    const barColor = colors.dark ? state.option.darkColor : state.option.color;
+    const barHoverColor = colors.dark ? state.option.darkHoverColor : state.option.hoverColor;
     const option = state.option;
     const labels = state.labels;
     const values = state.values;
@@ -133,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Nothing to draw if there is no data
     if (labels.length === 0) {
-      ctx.fillStyle = "#64748b";
+      ctx.fillStyle = colors.muted;
       ctx.font = "14px " + FONT;
       ctx.textAlign = "center";
       ctx.fillText("No data to chart.", width / 2, height / 2);
@@ -167,13 +194,13 @@ document.addEventListener("DOMContentLoaded", function () {
     ctx.textBaseline = "middle";
     for (let v = 0; v <= axisMax; v += step) {
       const y = yFor(v);
-      ctx.strokeStyle = v === 0 ? "#94a3b8" : "#e2e8f0";
+      ctx.strokeStyle = v === 0 ? colors.axis : colors.grid;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(left, Math.round(y) + 0.5);
       ctx.lineTo(left + plotWidth, Math.round(y) + 0.5);
       ctx.stroke();
-      ctx.fillStyle = "#64748b";
+      ctx.fillStyle = colors.muted;
       ctx.fillText(v.toLocaleString(), left - 8, y);
     }
 
@@ -186,13 +213,13 @@ document.addEventListener("DOMContentLoaded", function () {
       const barY = yFor(values[i]);
       const barHeight = top + plotHeight - barY;
 
-      ctx.fillStyle = i === state.hover ? option.hoverColor : option.color;
+      ctx.fillStyle = i === state.hover ? barHoverColor : barColor;
       drawBar(barX, barY, barWidth, barHeight, 6);
       bars.push({ x: barX, y: barY, w: barWidth, centerX: centerX });
 
       // Number above the bar (skipped when bars are too thin to read)
       if (slot >= 22) {
-        ctx.fillStyle = "#334155";
+        ctx.fillStyle = colors.value;
         ctx.font = "11px " + FONT;
         ctx.textAlign = "center";
         ctx.textBaseline = "alphabetic";
@@ -200,7 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Name under the bar
-      ctx.fillStyle = "#475569";
+      ctx.fillStyle = colors.text;
       ctx.font = "12px " + FONT;
       if (rotateLabels) {
         ctx.save();
@@ -222,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const titleCenter = left + Math.min(plotWidth, Math.max(visibleWidth - left - right, 100)) / 2;
 
     // Axis titles
-    ctx.fillStyle = "#475569";
+    ctx.fillStyle = colors.text;
     ctx.font = "bold 12px " + FONT;
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
@@ -238,9 +265,9 @@ document.addEventListener("DOMContentLoaded", function () {
     ctx.font = "12px " + FONT;
     const legendTextWidth = ctx.measureText(option.datasetLabel).width;
     const legendStart = titleCenter - (legendTextWidth + 22) / 2;
-    ctx.fillStyle = option.color;
+    ctx.fillStyle = barColor;
     ctx.fillRect(legendStart, 11, 14, 10);
-    ctx.fillStyle = "#475569";
+    ctx.fillStyle = colors.text;
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     ctx.fillText(option.datasetLabel, legendStart + 22, 16);
@@ -321,8 +348,9 @@ document.addEventListener("DOMContentLoaded", function () {
     render();
   });
 
-  // Redraw the chart when the window size changes
+  // Redraw the chart when the window size changes or the theme is switched
   window.addEventListener("resize", render);
+  window.addEventListener("themechange", render);
 
   // Redraw the chart whenever a different option is chosen in the dropdown
   if (chartSelect) {

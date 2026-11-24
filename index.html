@@ -14,13 +14,28 @@
 
   <!-- Load our custom stylesheet using a relative path -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Sets the saved (or device) theme before the page is drawn, so it does not flash -->
+  <script src="theme.js"></script>
 </head>
 <body>
   <!-- Page header with main title and short description -->
   <header class="page-header">
-    <div class="container">
-      <h1>Warehouse Inventory</h1>
-      <p class="subtitle">Browse item data, filter items in real time, and view item counts by category.</p>
+    <div class="container header-inner">
+      <div class="header-text">
+        <h1>Warehouse Inventory</h1>
+        <p class="subtitle">Browse item data, filter items in real time, and view item counts by category.</p>
+      </div>
+
+      <!-- Theme switch (top right): choose between the light and dark theme -->
+      <div class="theme-toggle" role="group" aria-label="Choose theme">
+        <button type="button" class="theme-btn" data-theme-choice="light" aria-pressed="true" aria-label="Light theme">
+          <span aria-hidden="true">&#9728;</span><span class="theme-btn-label">Light</span>
+        </button>
+        <button type="button" class="theme-btn" data-theme-choice="dark" aria-pressed="false" aria-label="Dark theme">
+          <span aria-hidden="true">&#9790;</span><span class="theme-btn-label">Dark</span>
+        </button>
+      </div>
     </div>
   </header>
 
