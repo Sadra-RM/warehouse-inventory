@@ -10,7 +10,7 @@
 
 
 
- Live Site: https://sadrarm18-cmd.github.io/warehouse-inventory/
+ Live Site: https://sadra-rm.github.io/warehouse-inventory/#dashboard
 
 
 
