@@ -146,8 +146,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const maxLabelWidth = Math.max.apply(null, labels.map(function (l) { return ctx.measureText(l).width; }));
     const maxValue = Math.max.apply(null, values.concat([1]));
     // Leave enough room on the left for the largest number plus the axis title
-    const left = Math.max(64, ctx.measureText(Math.ceil(maxValue * 1.15).toLocaleString()).width + 42);
-    const right = 16;
+    const narrow = width < 500; // phones get tighter margins to leave more room for the bars
+    const left = Math.max(narrow ? 52 : 64, ctx.measureText(Math.ceil(maxValue * 1.15).toLocaleString()).width + (narrow ? 34 : 42));
+    const right = narrow ? 10 : 16;
     const top = 36;
     const plotWidth = Math.max(width - left - right, 50);
     const slot = plotWidth / labels.length;
@@ -227,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ctx.textBaseline = "alphabetic";
     ctx.fillText(option.xLabel, titleCenter, height - 8);
     ctx.save();
-    ctx.translate(14, top + plotHeight / 2);
+    ctx.translate(narrow ? 12 : 14, top + plotHeight / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textBaseline = "middle";
     ctx.fillText(option.yLabel, 0, 0);
@@ -278,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Show a tooltip and highlight the bar under the mouse
-  canvas.addEventListener("mousemove", function (event) {
+  function showTooltipAt(event) {
     const layout = state.layout;
     if (!layout) return;
 
@@ -306,9 +307,15 @@ document.addEventListener("DOMContentLoaded", function () {
       tooltip.style.top = Math.max(bar.y - 8, 24) + "px";
       tooltip.style.display = "block";
     }
-  });
+  }
 
-  canvas.addEventListener("mouseleave", function () {
+  // Works for both a mouse (hover) and a finger (tap)
+  canvas.addEventListener("pointermove", showTooltipAt);
+  canvas.addEventListener("pointerdown", showTooltipAt);
+
+  canvas.addEventListener("pointerleave", function (event) {
+    // A finger leaves the canvas right after tapping, so keep the tooltip visible for touch
+    if (event.pointerType && event.pointerType !== "mouse") return;
     state.hover = -1;
     tooltip.style.display = "none";
     render();

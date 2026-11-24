@@ -240,20 +240,135 @@ tbody tr:last-child td {
 
 /* Responsive adjustments for mobile and tablet screens */
 @media (max-width: 768px) {
+  .container {
+    padding: 0 14px;
+  }
+
   .page-header {
     padding: 20px 0;
+    margin-bottom: 16px;
   }
 
   .page-header h1 {
     font-size: 1.45rem;
   }
 
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
   .card {
-    padding: 16px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .section-header {
+    margin-bottom: 12px;
+  }
+
+  .section-header h2 {
+    font-size: 1.1rem;
+  }
+
+  /* Chart title on top, dropdown below it using the full width */
+  .chart-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .chart-select-box {
+    width: 100%;
+  }
+
+  .chart-select {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    font-size: 16px; /* 16px stops iPhones from zooming in when the control is tapped */
+    padding: 10px 12px;
   }
 
   .search-box {
     max-width: 100%;
+  }
+
+  .search-input {
+    font-size: 16px; /* prevents the automatic zoom on iPhones */
+  }
+
+  .chart-wrapper {
+    height: 280px;
+  }
+
+  /* Smaller table text and spacing so more fits on the screen */
+  table {
+    font-size: 0.82rem;
+  }
+
+  th {
+    padding: 10px 10px;
+  }
+
+  td {
+    padding: 9px 10px;
+  }
+
+  /* Keep the "Item" column visible while scrolling the table sideways.
+     Solid backgrounds are needed so other columns do not show through it. */
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+
+  th:first-child {
+    background-color: #f1f5f9;
+    z-index: 2;
+    box-shadow: 2px 0 0 #e2e8f0;
+  }
+
+  td:first-child {
+    background-color: #ffffff;
+    box-shadow: 2px 0 0 #e2e8f0;
+  }
+
+  tbody tr:nth-child(even) td:first-child {
+    background-color: #f8fafc;
+  }
+
+  tbody tr:hover td:first-child {
+    background-color: #eff6ff;
+  }
+
+  th.sorted:first-child {
+    background-color: #dbeafe;
+  }
+
+  td.sorted-col:first-child {
+    background-color: #eaf1fe;
+  }
+
+  /* Hint that the table can be swiped sideways */
+  .table-container::before {
+    content: "Swipe sideways to see all columns \2192";
+    display: block;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-align: center;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    left: 0;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .page-header h1 {
+    font-size: 1.3rem;
   }
 
   .chart-wrapper {
