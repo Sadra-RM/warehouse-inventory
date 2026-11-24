@@ -3,8 +3,11 @@
 
 // Wait until the HTML document is fully loaded before drawing the chart
 document.addEventListener("DOMContentLoaded", function () {
-  // Read the global "data" array from data.js (use an empty array if missing)
-  const inventoryData = typeof data !== "undefined" && Array.isArray(data) ? data : [];
+  // Read the live inventory (original data.js items plus any edits) from store.js
+  const getItems = function () {
+    if (window.Inventory) return window.Inventory.items();
+    return typeof data !== "undefined" && Array.isArray(data) ? data : [];
+  };
 
   // Find the page elements we need
   const canvas = document.getElementById("categoryChart");
@@ -17,14 +20,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const ctx = canvas.getContext("2d");
   canvas.style.display = "block";
 
-  const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  const FONT = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
   // Group items by a field and either count them or add up a number field.
   //   groupField: which field to group by (category, zone, storage_location_id)
   //   sumField:   if given, add up this number field; otherwise count items
   function groupData(groupField, sumField) {
     const totals = {};
-    inventoryData.forEach(function (item) {
+    getItems().forEach(function (item) {
       const group = item[groupField] || "Unknown";
       const amount = sumField ? Number(item[sumField]) || 0 : 1;
       totals[group] = (totals[group] || 0) + amount;
@@ -39,6 +42,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // All available charts. Add a new entry here to add a new option.
   const chartOptions = {
+    stock_category: {
+      title: "Stock Quantity per Category",
+      groupField: "category",
+      sumField: "stock_level",
+      xLabel: "Category",
+      yLabel: "Units in Stock",
+      datasetLabel: "Units in Stock",
+      color: "#2563eb",
+      hoverColor: "#1d4ed8",
+      darkColor: "#3b82f6",
+      darkHoverColor: "#60a5fa"
+    },
+    stock_zone: {
+      title: "Stock Quantity per Zone",
+      groupField: "zone",
+      sumField: "stock_level",
+      xLabel: "Zone",
+      yLabel: "Units in Stock",
+      datasetLabel: "Units in Stock",
+      color: "#0d9488",
+      hoverColor: "#0f766e",
+      darkColor: "#14b8a6",
+      darkHoverColor: "#2dd4bf",
+      sortLabels: true
+    },
     category: {
       title: "Items per Category",
       groupField: "category",
@@ -56,10 +84,10 @@ document.addEventListener("DOMContentLoaded", function () {
       xLabel: "Zone",
       yLabel: "Number of Items",
       datasetLabel: "Number of Items",
-      color: "#7c3aed",
-      hoverColor: "#6d28d9",
-      darkColor: "#8b5cf6",
-      darkHoverColor: "#a78bfa",
+      color: "#6366f1",
+      hoverColor: "#4f46e5",
+      darkColor: "#818cf8",
+      darkHoverColor: "#a5b4fc",
       sortLabels: true
     },
     location: {
@@ -82,21 +110,21 @@ document.addEventListener("DOMContentLoaded", function () {
       xLabel: "Category",
       yLabel: "Total Orders (last month)",
       datasetLabel: "Total Orders Last Month",
-      color: "#059669",
-      hoverColor: "#047857",
-      darkColor: "#10b981",
-      darkHoverColor: "#34d399"
+      color: "#f59e0b",
+      hoverColor: "#d97706",
+      darkColor: "#fbbf24",
+      darkHoverColor: "#fcd34d"
     }
   };
 
   // Everything needed to redraw the current chart (on hover and on window resize)
-  const state = { option: chartOptions.category, labels: [], values: [], hover: -1, layout: null };
+  const state = { option: chartOptions.stock_category, labels: [], values: [], hover: -1, layout: null };
 
   // Small black box that shows the label and value when you point at a bar
   const tooltip = document.createElement("div");
   tooltip.style.cssText =
     "position:absolute;display:none;pointer-events:none;z-index:2;background:var(--tooltip-bg);color:var(--tooltip-text);" +
-    "padding:6px 10px;border-radius:6px;font-size:12px;white-space:nowrap;transform:translate(-50%,-100%);";
+    "padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 8px 24px rgba(15,23,42,.18);white-space:nowrap;transform:translate(-50%,-100%);";
   chartWrapper.appendChild(tooltip);
 
   // Pick a "nice" step size (1, 2, 5, 10, 20, 50 ...) for the vertical axis
@@ -278,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Build the data for one option and draw it
   function drawChart(optionKey) {
-    const option = chartOptions[optionKey] || chartOptions.category;
+    const option = chartOptions[optionKey] || chartOptions.stock_category;
 
     // Build the labels and values for this chart
     const totals = groupData(option.groupField, option.sumField);
@@ -359,6 +387,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Rebuild the bars when items are edited, added or deleted
+  window.addEventListener("inventorychange", function () {
+    drawChart(chartSelect ? chartSelect.value : "stock_category");
+  });
+
+  // The chart cannot measure itself while its page is hidden, so redraw when it becomes visible
+  window.addEventListener("viewchange", function () {
+    requestAnimationFrame(render);
+  });
+
   // Draw the first chart when the page loads
-  drawChart(chartSelect ? chartSelect.value : "category");
+  drawChart(chartSelect ? chartSelect.value : "stock_category");
 });

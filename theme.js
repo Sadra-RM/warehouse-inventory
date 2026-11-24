@@ -55,5 +55,11 @@
         applyTheme(button.getAttribute("data-theme-choice"), true);
       });
     });
+    // Single button in the top bar that switches between light and dark
+    document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        applyTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark", true);
+      });
+    });
   });
 })();
