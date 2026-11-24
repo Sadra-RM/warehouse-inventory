@@ -99,6 +99,45 @@ body {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
+/* Title and dropdown above the chart */
+.chart-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chart-select-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.chart-select {
+  padding: 9px 12px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.chart-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Lets wide charts (many bars) scroll sideways */
+.chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
 /* Chart container with fixed responsive height for Chart.js */
 .chart-wrapper {
   position: relative;
@@ -139,6 +178,37 @@ td {
   border-bottom: 1px solid #e2e8f0;
   color: #1e293b;
   white-space: nowrap;
+}
+
+/* Clickable column headers for sorting */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+th.sortable:hover {
+  background-color: #e2e8f0;
+}
+
+th.sortable:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+}
+
+/* The column that is currently sorted: colored header and a light colored column */
+th.sorted {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border-bottom-color: #2563eb;
+}
+
+th.sorted:hover {
+  background-color: #bfdbfe;
+}
+
+td.sorted-col {
+  background-color: rgba(37, 99, 235, 0.09);
 }
 
 /* Zebra striping and hover highlight for better readability */
